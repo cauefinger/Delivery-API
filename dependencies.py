@@ -1,7 +1,9 @@
 from models import db
 from sqlalchemy.orm import sessionmaker, Session
 from models import Usuario
-from fastapi import Depends
+from fastapi import Depends, HTTPException  
+from main import SECRET_KEY, ALGORITHM
+from jose import jwt, JWTError
 
 def pegar_sessao():
 
@@ -13,6 +15,18 @@ def pegar_sessao():
     finally:          
         sessao.close()
 
-def verificar_token(token, sessao: Session = Depends(pegar_sessao)): # verificar se o token é válido. se sim, extrair o id do usuario.
-    usuario = sessao.query(Usuario).filter(Usuario.id==1).first() 
-    return usuario # qual é o usuario que é dono do token?
+
+def verificar_token(token, sessao: Session = Depends(pegar_sessao)):
+
+    try:
+        dic_info = jwt.decode(token,SECRET_KEY, ALGORITHM)
+        id_usuario = dic_info.get("sub")
+    except JWTError:
+        HTTPException(status_code=401, detail="Acesso negado, verifique a validade do token.")
+
+
+    usuario = Session.query(Usuario). filter(Usuario.id==id_usuario).first()
+    if not usuario:
+        raise HTTPException(status_code=401, detail="Acesso inválido.")
+    return usuario
+
