@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from main import ACESS_TOKEN_EXPIRED_MINUTES, ALGORITHM, SECRET_KEY   
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 auth_router = APIRouter(prefix="/auth", tags=["autentificação"])
@@ -75,6 +76,27 @@ async def login(login_schema: LoginSchema, sessao: Session  = Depends(pegar_sess
             "refresh_token": refresh_token,
             "token_type": "bearer"
                }
+
+
+@auth_router.post("/login-form")  # LOGAR PELO AUTHORIZE NO SWAGGER
+
+async def login_pelo_form(dados_formulario: OAuth2PasswordRequestForm = Depends(), sessao: Session  = Depends(pegar_sessao)):
+    usuario = autenticar_usuario(dados_formulario.username, dados_formulario.password, sessao)
+
+    if not usuario:
+        raise HTTPException(status_code=400, detail="Usuário não encontrado ou credenciais inválidas.")
+    
+    else:
+        acess_token = criar_token(usuario.id)
+        refresh_token = criar_token(usuario.id, duracao_token=timedelta(days=7))
+
+        return{
+            "acess_token": acess_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer"
+               }
+
+    
 
 @auth_router.get("/refresh")
 
