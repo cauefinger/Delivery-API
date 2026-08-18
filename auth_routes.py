@@ -51,15 +51,11 @@ def criar_token(usuario_id, duracao_token = timedelta(minutes= ACESS_TOKEN_EXPIR
 
     data_expiracao = datetime.now(timezone.utc) + duracao_token # datetime + 30 min
     dic_info = {
-        "sub": usuario_id, 
+        "sub": str(usuario_id), 
         "exp": data_expiracao 
         } 
     jwt_codificado = jwt.encode(dic_info,SECRET_KEY, ALGORITHM )
     return jwt_codificado
-
-def verificar_token(token, sessao: Session = Depends(pegar_sessao)):                                                                    # se sim, extrair o id do usuario.
-    usuario = sessao.query(Usuario).filter(Usuario.id==1).first() 
-    return usuario 
 
 
 @auth_router.post("/login") 

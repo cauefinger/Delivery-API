@@ -4,7 +4,7 @@ from models import Usuario
 from fastapi import Depends, HTTPException  
 from main import SECRET_KEY, ALGORITHM
 from jose import jwt, JWTError
-
+from configkey import oauth2_schema
 def pegar_sessao():
 
     try:
@@ -16,11 +16,11 @@ def pegar_sessao():
         sessao.close()
 
 
-def verificar_token(token, sessao: Session = Depends(pegar_sessao)):
+def verificar_token(token:str = Depends(oauth2_schema), sessao: Session = Depends(pegar_sessao)):
 
     try:
         dic_info = jwt.decode(token,SECRET_KEY, ALGORITHM)
-        id_usuario = dic_info.get("sub")
+        id_usuario = int(dic_info.get("sub"))
     except JWTError:
         HTTPException(status_code=401, detail="Acesso negado, verifique a validade do token.")
 
