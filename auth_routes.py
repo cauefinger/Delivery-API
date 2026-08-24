@@ -17,15 +17,6 @@ essa é a rota padrão de autentificação do nosso sistema.
 '''
 
 
-def autenticar_usuario(email, senha, sessao):
-    usuario = sessao.query(Usuario).filter(Usuario.email==email).first() 
-    if not usuario:
-        return False
-    elif not bcrypt_context.verify(senha, usuario.senha):
-        return False
-    return usuario
-
-
 @auth_router.get("/")
 async def autenticar():
     return {"mensagem": "você acessou a rota padrão de autentificação", "autenticado": False}
@@ -58,6 +49,14 @@ def criar_token(usuario_id, duracao_token = timedelta(minutes= ACESS_TOKEN_EXPIR
     jwt_codificado = jwt.encode(dic_info,SECRET_KEY, ALGORITHM )
     return jwt_codificado
 
+
+def autenticar_usuario(email, senha, sessao):
+    usuario = sessao.query(Usuario).filter(Usuario.email==email).first() 
+    if not usuario:
+        return False
+    elif not bcrypt_context.verify(senha, usuario.senha):
+        return False
+    return usuario
 
 @auth_router.post("/login") 
 
