@@ -1,1 +1,15 @@
-Generic single-database configuration.
+# Generic single-database configuration.
+# fazer primeiro, organizar depois 
+
+
+'''
+### TASKS ###
+
+[ ] Criar token e refresh token
+[ ] Finalizar auth routes
+[ ] Organizar controller, models e service
+
+
+
+
+'''
