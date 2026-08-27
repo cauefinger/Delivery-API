@@ -4,7 +4,7 @@ from models import Usuario
 from fastapi import Depends, HTTPException  
 from main import SECRET_KEY, ALGORITHM
 from jose import jwt, JWTError
-from configkey import oauth2_schema
+from configkey import oauth2_scheme
 def pegar_sessao():
 
     try:
@@ -16,7 +16,7 @@ def pegar_sessao():
         sessao.close()
 
 
-def verificar_token(token:str = Depends(oauth2_schema), sessao: Session = Depends(pegar_sessao)):
+def verificar_token(token:str = Depends(oauth2_scheme), sessao: Session = Depends(pegar_sessao)):
 
     try:
         dic_info = jwt.decode(token,SECRET_KEY, ALGORITHM)
@@ -30,3 +30,7 @@ def verificar_token(token:str = Depends(oauth2_schema), sessao: Session = Depend
         raise HTTPException(status_code=401, detail="Acesso inválido.")
     return usuario
 
+def verificar_token(
+        token: str = Depends(oauth2_scheme)
+        ):
+    try:

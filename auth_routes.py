@@ -9,7 +9,7 @@ from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
 from main import ACESS_TOKEN_EXPIRED_MINUTES, ALGORITHM, SECRET_KEY   
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-
+from passlib.context import CryptContext
 
 auth_router = APIRouter(prefix="/auth", tags=["autentificação"])
 '''  todo inicio de rota tem o "auth" porque esse é o nosso prefixo
@@ -52,11 +52,13 @@ def criar_token(usuario_id, duracao_token = timedelta(minutes= ACESS_TOKEN_EXPIR
 
 def autenticar_usuario(email, senha, sessao):
     usuario = sessao.query(Usuario).filter(Usuario.email==email).first() 
-    if not usuario:
-        return False
-    elif not bcrypt_context.verify(senha, usuario.senha):
-        return False
+
+    if not usuario or usuario.senha != senha:
+        raise HTTPException(status_code=401, detail="Credenciais inválidas.")
+    
     return usuario
+
+
 
 @auth_router.post("/login") 
 
